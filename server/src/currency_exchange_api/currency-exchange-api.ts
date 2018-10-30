@@ -1,14 +1,17 @@
+import { Preferences } from './preferences';
+
 import oxr from 'open-exchange-rates';
 
 import fx from 'money';
 
-import fs from 'fs';
+import * as fs from 'fs';
 
-import path from 'path';
+import * as path from 'path';
 
 export class CurrencyExchangeAPI {
 
     public latestRates: any;
+    public preferences: Preferences;
 
     private apiKey: string;
     private currencyBase: string =  'USD';
@@ -29,6 +32,7 @@ export class CurrencyExchangeAPI {
 
         oxr.set({ app_id: this.apiKey });
 
+        this.getPreferences();
       /*   oxr.latest(() => {
             fx.rates = oxr.rates;
             fx.base = oxr.base;
@@ -52,17 +56,31 @@ export class CurrencyExchangeAPI {
 
     public getRate(amount: number, destinationcurrency: string, sourcecurrency: string  = 'USD') {
         this.initializeFX();
-        return fx(amount).from(sourcecurrency).to(destinationcurrency);
+        const results = new Array<any>();
+        this.preferences.currencypreferences.forEach( (c: string) => {
+            results.push(fx(amount).from(this.preferences.base).to(c));
+        });
+        console.log(results);
+        return results;
     }
 
-    public  getPreferences() {
-       const filePath  = path.join(__dirname, './currency-preferences.json');
-       fs.readFile(filePath, { encoding: 'utf8'}, (err, contents) => {
-           console.log(err);
+    public getRateDefault(destinationcurrency: string, sourcecurrency: string  = 'USD') {
+        this.initializeFX();
+        return fx(this.preferences.defaultamount).from(sourcecurrency).to(destinationcurrency);
+    }
+
+    public getPreferences(): Preferences {
+       this.preferences = new Preferences ();
+       const filePath  =  __dirname + '/preferences/currency-preferences.json';
+       fs.readFile(filePath, { encoding: 'utf8'}, (err: any, contents: any) => {
            if (!err) {
-            console.log(contents);
+            const data = JSON.parse(contents);
+            this.preferences.base = data.base;
+            this.preferences.currencypreferences = data.currencypreference;
+            this.preferences.defaultamount = data.defaultamount;
            }
         });
+       return this.preferences;
     }
 
 }

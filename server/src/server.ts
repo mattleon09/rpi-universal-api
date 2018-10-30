@@ -19,7 +19,8 @@ currency.getLatestRates().then( (latest) => {
     currency.latestRates = latest;
 });
 
-app.get('/', (req, res) =>  {
+
+app.get('/', (req: any, res: any) =>  {
     weather.getLocation().then( (location) => {
         console.log(location);
         res.send(location);
@@ -27,7 +28,7 @@ app.get('/', (req, res) =>  {
 });
 
 // Weather
-app.get('/weather', (req, res) => {
+app.get('/weather', (req: any, res: any) => {
     weather.getLocation().then( (location) => {
         console.log(location);
         weather.getCurrentConditions(location.longitude, location.latitude).then( (forecast) => {
@@ -38,20 +39,23 @@ app.get('/weather', (req, res) => {
     });
 });
 
-app.get('/currency', (req, res) => {
-     currency.getRate(100, 'SEK');
+app.get('/currency', (req: any, res: any) => {
+     //currency.getRate(100, 'SEK');
 });
 
-app.get('/currency/pref/remove/{currency}', (req, res) => {
+app.get('/currency/latest', (req: any, res: any) => {
+    res.send(currency.getLatestRates());
+});
+
+app.get('/currency/pref/remove/{currency}', (req: any, res: any) => {
 
     res.send('Currency preference removed');
 });
 
-app.get('/currency/pref/read', (req, res) => {
-    currency.getPreferences();
-  /*   currency.getPreferences().then( (resp) => {
-       console.log(resp);
-    }); */
+app.get('/currency/pref/read', (req: any, res: any) => {   
+   // console.log(currency.getPreferences());  
+    //currency.getRate(100,'SEK','USD');
+        res.send( currency.getPreferences());
 });
 
 app.listen(3000, () => console.log('Universal API listening on port 3000!'));

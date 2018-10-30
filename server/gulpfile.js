@@ -1,23 +1,27 @@
-//const {series} = require('gulp');
-var typescript = require('gulp-tsc');
+const {series} = require('gulp');
 var gulp = require('gulp');
+var ts = require('gulp-typescript');
+var run = require('gulp-run-command').default;
+
 
 gulp.task('compile', function() {
-    gup.src(['src/**/*.ts'])
-    .pipe(typescript())
-    .pipe(gulp.dest('dest/'))
+    return gulp.src(['src/**/*.ts'])
+    .pipe(ts({
+        noImplicitAny: true,
+    }))
+    .pipe(gulp.dest('dist/'))
 });
 
 gulp.task('copy:preferences',function() {
-    return gulp.src('./src/preferences/*.json')
-    .pipe(gulp.dest('dist/preferences/'));
+    return gulp.src('./src/currency_exchange_api/preferences/*.json')
+    .pipe(gulp.dest('dist/currency_exchange_api/preferences/'));
 });
 
 
-gulp.task('watch',['watch-ts']);
-gulp.task('watch.ts', ['ts'], function () {
-    return gulp.watch('Scripts/**/*.ts', ['ts']);
-});
+gulp.task('watch',['watch-ts','watch-node','copy:preferences'])
+gulp.task('watch-node', run('npm run watch-node'))
+gulp.task('watch-ts', run('npm run watch-ts'))
+
 
 gulp.task('default', ['watch']);
 

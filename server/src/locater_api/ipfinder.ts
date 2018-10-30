@@ -1,4 +1,4 @@
-import os, { getPriority } from 'os';
+import * as os from 'os';
 import publicIp from 'public-ip';
 
 const ifaces = os.networkInterfaces();
@@ -7,7 +7,7 @@ export class IpFinder {
 
     public async getPublicIp(): Promise<string> {
         let returnValue: string;
-        await publicIp.v4().then( (ip) => {
+        await publicIp.v4().then( (ip: any) => {
           returnValue = ip;
         });
         return returnValue;

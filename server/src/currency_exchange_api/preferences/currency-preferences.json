@@ -4,5 +4,6 @@
         "SEK",
         "HTG",
         "CAD"
-    ]
+    ],
+    "defaultamount": 100
 }
