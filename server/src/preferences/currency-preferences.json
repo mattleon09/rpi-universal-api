@@ -1,0 +1,8 @@
+{
+    "base": "USD",
+    "currencypreferences": [
+        "SEK",
+        "HTG",
+        "CAD"
+    ]
+}
