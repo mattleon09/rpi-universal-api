@@ -15,11 +15,6 @@ const CURRENCY_EXCHANGE_API_KEY = '8f8e93c51e144663a1b246ec18ac8ca9';
 const weather = new WeatherAPI(WEATHER_API_KEY);
 const currency = new CurrencyExchangeAPI(CURRENCY_EXCHANGE_API_KEY);
 
-currency.getLatestRates().then( (latest) => {
-    currency.latestRates = latest;
-});
-
-
 app.get('/', (req: any, res: any) =>  {
     weather.getLocation().then( (location) => {
         console.log(location);
@@ -39,12 +34,15 @@ app.get('/weather', (req: any, res: any) => {
     });
 });
 
+//Currency
 app.get('/currency', (req: any, res: any) => {
      //currency.getRate(100, 'SEK');
 });
 
 app.get('/currency/latest', (req: any, res: any) => {
-    res.send(currency.getLatestRates());
+    currency.getLatestRates().then( (resp) => {
+        res.send(resp);
+    });
 });
 
 app.get('/currency/pref/remove/{currency}', (req: any, res: any) => {
@@ -52,10 +50,58 @@ app.get('/currency/pref/remove/{currency}', (req: any, res: any) => {
     res.send('Currency preference removed');
 });
 
+app.get('/currency/getrate/:destcur/:sourcecur/', (req: any, res: any) => {
+    let data = {
+        "currencies": {
+            "destcur": req.params.destcur,
+            "sourcecur": req.params.sourcecur
+        }
+    }
+    let response = currency.getRateDefault(data.currencies.destcur,data.currencies.sourcecur);
+    if(response) {
+        let responsedata = {
+            "base": "100 " + data.currencies.sourcecur,
+            "conversions": response
+        }
+        res.send(responsedata);
+    }
+});
+
+app.get('/currency/getrate/:amount/:destcur/:sourcecur/', (req: any, res: any) => {
+    let data = {
+        "currencies": {
+            "amount": req.params.amount,
+            "destcur": req.params.destcur,
+            "sourcecur": req.params.sourcecur
+        }
+    }
+    let response = currency.getRate(data.currencies.amount,data.currencies.destcur,data.currencies.sourcecur);
+    if(response) {
+        let responsedata = {
+            "base": data.currencies.amount + " " + data.currencies.sourcecur,
+            "conversions": response
+        }
+        res.send(responsedata);
+    }
+});
+
+app.get('/currency/getrate/', (req: any, res: any) => {
+     currency.getPreferences().then( (pref) => {
+        if(pref) {
+            let response = currency.getRateFromPreferences(pref);
+            if(response) {
+                let data = {
+                    "base": pref.defaultamount + " " + pref.base,
+                    "conversions": response
+                }
+                res.send(data);
+            }
+        }
+     });
+});
+
 app.get('/currency/pref/read', (req: any, res: any) => {   
-   // console.log(currency.getPreferences());  
-    //currency.getRate(100,'SEK','USD');
-        res.send( currency.getPreferences());
+        res.send(currency.getPreferences());
 });
 
 app.listen(3000, () => console.log('Universal API listening on port 3000!'));
