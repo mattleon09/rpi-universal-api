@@ -10,8 +10,13 @@ export class LocaterAPI {
       this.ipfinder = new IpFinder();
   }
 
-  public async getLongLat(): Promise<GeoIpModel> {
-    const ip = await this.ipfinder.getPublicIp();
+  public async getLongLat(ipaddress: string): Promise<GeoIpModel> {
+    let ip: string;
+    if (ipaddress === '') {
+      ip = await this.ipfinder.getPublicIp();
+    } else {
+      ip = ipaddress;
+    }
     const geo = geoip.lookup(ip);
     const model  = new GeoIpModel();
     model.range = geo.range;

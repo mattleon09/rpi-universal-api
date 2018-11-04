@@ -19,14 +19,9 @@ export class WeatherAPI {
     this.forecastio = new ForecastIo(this.apiKey);
     this.locater = new LocaterAPI();
 
-    this.getLocation().then( (location) => {
-      this.locationModel = location;
-    }).catch( (err) => {
-      console.log(err);
-    });
   }
-  public async getLocation(): Promise<GeoIpModel> {
-    return await this.locater.getLongLat().then( (loc) => {
+  public async getLocation(ip: string = ''): Promise<GeoIpModel> {
+    return await this.locater.getLongLat(ip).then( (loc) => {
       return loc;
     });
   }

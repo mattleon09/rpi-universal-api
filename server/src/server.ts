@@ -22,9 +22,22 @@ app.get('/', (req: any, res: any) =>  {
     });
 });
 
+app.get('/location/:ip', (req: any, res: any) =>  {
+    const data = {
+        ip : req.params.ip,
+    };
+    weather.getLocation(data.ip).then( (location) => {
+        console.log(location);
+        res.send(location);
+    });
+});
+
 // Weather
-app.get('/weather', (req: any, res: any) => {
-    weather.getLocation().then( (location) => {
+app.get('/weather/:ip', (req: any, res: any) => {
+    const data = {
+        ip : req.params.ip,
+    };
+    weather.getLocation(data.ip).then( (location) => {
         console.log(location);
         weather.getCurrentConditions(location.longitude, location.latitude).then( (forecast) => {
             res.send(forecast);
@@ -34,9 +47,9 @@ app.get('/weather', (req: any, res: any) => {
     });
 });
 
-//Currency
+// Currency
 app.get('/currency', (req: any, res: any) => {
-     //currency.getRate(100, 'SEK');
+     // currency.getRate(100, 'SEK');
 });
 
 app.get('/currency/latest', (req: any, res: any) => {
@@ -51,56 +64,56 @@ app.get('/currency/pref/remove/{currency}', (req: any, res: any) => {
 });
 
 app.get('/currency/getrate/:destcur/:sourcecur/', (req: any, res: any) => {
-    let data = {
-        "currencies": {
-            "destcur": req.params.destcur,
-            "sourcecur": req.params.sourcecur
-        }
-    }
-    let response = currency.getRateDefault(data.currencies.destcur,data.currencies.sourcecur);
-    if(response) {
-        let responsedata = {
-            "base": "100 " + data.currencies.sourcecur,
-            "conversions": response
-        }
+    const  data = {
+        currencies: {
+            destcur: req.params.destcur,
+            sourcecur: req.params.sourcecur,
+        },
+    };
+    const response = currency.getRateDefault(data.currencies.destcur, data.currencies.sourcecur);
+    if (response) {
+        const responsedata = {
+            base: '100 ' + data.currencies.sourcecur,
+            conversions: response,
+        };
         res.send(responsedata);
     }
 });
 
 app.get('/currency/getrate/:amount/:destcur/:sourcecur/', (req: any, res: any) => {
-    let data = {
-        "currencies": {
-            "amount": req.params.amount,
-            "destcur": req.params.destcur,
-            "sourcecur": req.params.sourcecur
-        }
-    }
-    let response = currency.getRate(data.currencies.amount,data.currencies.destcur,data.currencies.sourcecur);
-    if(response) {
-        let responsedata = {
-            "base": data.currencies.amount + " " + data.currencies.sourcecur,
-            "conversions": response
-        }
+    const data = {
+        currencies: {
+            amount: req.params.amount,
+            destcur: req.params.destcur,
+            sourcecur: req.params.sourcecur,
+        },
+    };
+    const response = currency.getRate(data.currencies.amount, data.currencies.destcur, data.currencies.sourcecur);
+    if (response) {
+        const responsedata = {
+            base: data.currencies.amount + ' ' + data.currencies.sourcecur,
+            conversions: response,
+        };
         res.send(responsedata);
     }
 });
 
 app.get('/currency/getrate/', (req: any, res: any) => {
      currency.getPreferences().then( (pref) => {
-        if(pref) {
-            let response = currency.getRateFromPreferences(pref);
-            if(response) {
-                let data = {
-                    "base": pref.defaultamount + " " + pref.base,
-                    "conversions": response
-                }
+        if (pref) {
+            const response = currency.getRateFromPreferences(pref);
+            if (response) {
+                const data = {
+                    base: pref.defaultamount + ' ' + pref.base,
+                    conversions: response,
+                };
                 res.send(data);
             }
         }
      });
 });
 
-app.get('/currency/pref/read', (req: any, res: any) => {   
+app.get('/currency/pref/read', (req: any, res: any) => {
         res.send(currency.getPreferences());
 });
 
