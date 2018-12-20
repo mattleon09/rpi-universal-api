@@ -33,6 +33,17 @@ app.get('/location/:ip', (req: any, res: any) =>  {
 });
 
 // Weather
+app.get('/weather', (req: any, res: any) => {
+    weather.getLocation().then( (location) => {
+        console.log(location);
+        weather.getCurrentConditions(location.longitude, location.latitude).then( (forecast) => {
+            res.send(forecast);
+        });
+    }).catch( (err) => {
+        console.log(err);
+    });
+});
+
 app.get('/weather/:ip', (req: any, res: any) => {
     const data = {
         ip : req.params.ip,
